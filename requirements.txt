@@ -1,0 +1,19 @@
+# --- Xử lý ảnh ---
+opencv-python    # Thư viện xử lý ảnh chính: đọc/ghi, chuyển màu, resize, overlay, vẽ mask
+numpy             # Tính toán ma trận, thao tác pixel và dữ liệu ảnh số
+
+# --- Tiền xử lý và tính năng phụ trợ ---
+scikit-image      # Các hàm xử lý ảnh nâng cao như lọc, Canny, regionprops, morphology
+scikit-learn      # Các thuật toán máy học phụ trợ (KMeans, StandardScaler)
+pyyaml            # Đọc file cấu hình .yaml (dùng cho config hệ thống)
+
+# --- Quản lý dữ liệu và xuất kết quả ---
+pandas            # Lưu trữ và xuất bảng kết quả (DataFrame, CSV)
+tensorboard       # Ghi log huấn luyện và hiển thị biểu đồ (learning curve, loss, dice)
+
+# --- Deep Learning ---
+torch             # PyTorch – thư viện học sâu chính để huấn luyện mô hình U-Net
+torchvision       # Xử lý ảnh tiện ích cho PyTorch (transform, dataset, pretrained models)
+
+# --- Tiện ích huấn luyện và báo tiến trình ---
+tqdm              # Hiển thị thanh tiến trình (progress bar) khi huấn luyện hoặc xử lý ảnh hàng loạt
