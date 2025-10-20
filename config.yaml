@@ -1,0 +1,75 @@
+# ==============================
+# CẤU HÌNH HỆ THỐNG XỬ LÝ ẢNH HUỲNH QUANG
+# ==============================
+
+io:
+  input_dir: input          # Thư mục chứa ảnh đầu vào
+  out_dir: out              # Thư mục lưu kết quả đầu ra
+  save_mode: "report"       # Cách lưu ảnh: "report" (mask + overlay) | "unet" (dataset huấn luyện)
+  unet_raw_dir: "data/raw"  # Thư mục gốc để lưu dữ liệu thô (khi chọn save_mode = "unet")
+
+# ------------------------------
+# Tiền xử lý ảnh (Preprocess)
+# ------------------------------
+preprocess:
+  denoise:
+    gaussian_ksize: 7       # Kích thước kernel Gaussian (số lẻ, càng lớn càng mượt)
+    gaussian_sigma: 1.5     # Độ lệch chuẩn Gaussian – mức độ làm mờ
+  clahe:
+    enabled: true           # Bật/tắt tăng tương phản CLAHE
+    clip_limit: 2.0         # Giới hạn độ tăng tương phản (tránh phóng đại nhiễu)
+    tile_grid_size: 8       # Số ô chia nhỏ ảnh khi áp dụng CLAHE (8x8 tile)
+
+# ------------------------------
+# Thuật toán tách vùng (Segmentation)
+# ------------------------------
+segmentation:
+  mode: "chanvese"              # Chọn mô hình phân vùng: "chanvese" hoặc "unet"
+
+# ------------------------------
+# Cấu hình mô hình U-Net
+# ------------------------------
+unet:
+  model_path: "checkpoints/unet_best.pt"  # Đường dẫn model U-Net đã huấn luyện
+  input_size: 256                         # Kích thước ảnh đưa vào mạng (phải chia hết cho 16)
+  threshold: 0.5                          # Ngưỡng nhị phân mask đầu ra (0–1)
+
+# ------------------------------
+# Cấu hình thuật toán Chan–Vese
+# ------------------------------
+chanvese:
+  iterations: 100          # Số vòng lặp cập nhật biên (càng cao càng chính xác, nhưng chậm hơn)
+  smoothing: 3             # Mức độ làm mượt biên giữa các vòng lặp
+  lambda1: 1.0             # Trọng số cho vùng trong biên
+  lambda2: 3.0             # Trọng số cho vùng ngoài biên
+  init: "otsu"             # Cách khởi tạo mặt nạ ban đầu: "checkerboard" | "disk" | "otsu"
+  disk_radius: 30          # Bán kính đĩa khởi tạo nếu chọn init = "disk"
+  min_region_area: 500     # Bỏ qua vùng nhỏ hơn giá trị này (lọc nhiễu)
+  min_hole_area: 100       # Lấp các lỗ nhỏ hơn giá trị này
+  keep_largest: false      # Nếu true → chỉ giữ lại vùng lớn nhất (ROI chính)
+
+hotspot:
+  k_clusters: 3        # số cụm cho K-Means
+  min_region_area: 100
+  min_hole_area: 50
+  keep_largest: 
+    false      # Nếu true → chỉ giữ lại vùng lớn nhất (hotspot chính)
+  
+  # Các thông số cho bước nối biên + fill
+  close_kernel: 7
+  bridge_kernel: 5
+
+# ------------------------------
+# Ước lượng nền (Background)
+# ------------------------------
+background:
+  method: "outside_mask"   # Cách tính nền: "outside_mask" (trung bình ngoài ROI) | "percentile" (dựa trên phân vị sáng)
+  percentile: 20           # Phân vị dùng khi chọn method = "percentile" (thường 10–30%)
+
+# ------------------------------
+# Tính CTCF (Corrected Total Cell Fluorescence)
+# ------------------------------
+ctcf:
+  clip_min: 0              # Ngưỡng cường độ tối thiểu (0 = không cắt)
+  clip_max: 65535          # Ngưỡng cường độ tối đa (đối với ảnh 16-bit)
+
